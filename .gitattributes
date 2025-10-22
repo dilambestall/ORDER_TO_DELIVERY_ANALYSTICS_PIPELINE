@@ -1,1 +1,28 @@
+# Đảm bảo tất cả file text dùng LF để tránh lỗi line endings
 * text=auto eol=lf
+
+# Python
+*.py text eol=lf
+
+# SQL scripts
+*.sql text eol=lf
+
+# Jupyter Notebooks (giữ nguyên binary format)
+*.ipynb binary
+
+# CSV/Parquet data (binary, không diff)
+*.csv text eol=lf
+*.parquet binary
+
+# Config files
+*.yml text eol=lf
+*.yaml text eol=lf
+*.toml text eol=lf
+*.ini text eol=lf
+
+# Markdown / Docs
+*.md text eol=lf
+*.rst text eol=lf
+
+# Shell scripts
+*.sh text eol=lf
