@@ -1,13 +1,25 @@
+# =============================
+# 🚫 DATA FILES
+# =============================
+
 # Ignore dữ liệu raw và output
 data/
 lake/
 *.csv
 *.parquet
+*.xlsx
+
+# =============================
+# 🚫 NOTEBOOKS
+# =============================
 
 # Ignore notebook checkpoints
 .ipynb_checkpoints/
 
-# Ignore cache & temp files
+# =============================
+# 🚫 CACHE & TEMP FILES
+# =============================
+
 __pycache__/
 *.pyc
 *.pyo
@@ -15,7 +27,10 @@ __pycache__/
 *.tmp
 *.log
 
-# Ignore environment & dependency folders
+# =============================
+# 🚫 ENVIRONMENTS
+# =============================
+
 .env
 .venv/
 env/
@@ -24,12 +39,37 @@ venv/
 .envrc
 *.env
 
-# Ignore OS files
+# =============================
+# 🚫 OS FILES
+# =============================
+
 .DS_Store
 Thumbs.db
 
-# Ignore IDE/editor configs
+# =============================
+# 🚫 IDE / EDITOR CONFIGS
+# =============================
+
 .vscode/
 .idea/
 *.swp
 *.swo
+
+# =============================
+# 🚫 AIRFLOW LOCAL FILES
+# =============================
+
+# Airflow database và logs (local only)
+airflow.db
+airflow-webserver.pid
+airflow.cfg
+webserver_config.py
+logs/
+airflow/
+
+# =============================
+# ✅ KEEP DAG FILES
+# =============================
+
+!dags/
+!dags/**/*.py
