@@ -59,17 +59,16 @@ Thumbs.db
 # 🚫 AIRFLOW LOCAL FILES
 # =============================
 
-# Airflow database và logs (local only)
-airflow.db
-airflow-webserver.pid
-airflow.cfg
-webserver_config.py
-logs/
-airflow/
+# Ignore toàn bộ nội dung trong airflow
+airflow/*
 
-# =============================
-# ✅ KEEP DAG FILES
-# =============================
+# ✅ Nhưng giữ lại DAGs (để có thể push lên GitHub)
+!airflow/dags/
+!airflow/dags/**/*.py
 
-!dags/
-!dags/**/*.py
+# Ignore các file Airflow runtime local
+airflow/airflow.db
+airflow/airflow.cfg
+airflow/webserver_config.py
+airflow/airflow-webserver.pid
+airflow/logs/
