@@ -2,7 +2,6 @@
 # 🚫 DATA FILES
 # =============================
 
-# Ignore dữ liệu raw và output
 data/
 lake/
 *.csv
@@ -10,10 +9,16 @@ lake/
 *.xlsx
 
 # =============================
+# 🚫 DBT BUILD ARTIFACTS
+# =============================
+
+dbt/target/
+dbt/logs/
+
+# =============================
 # 🚫 NOTEBOOKS
 # =============================
 
-# Ignore notebook checkpoints
 .ipynb_checkpoints/
 
 # =============================
@@ -35,9 +40,7 @@ __pycache__/
 .venv/
 env/
 venv/
-.venv/*
-.envrc
-*.env
+odap_env/
 
 # =============================
 # 🚫 OS FILES
@@ -52,21 +55,16 @@ Thumbs.db
 
 .vscode/
 .idea/
-*.swp
-*.swo
 
 # =============================
 # 🚫 AIRFLOW LOCAL FILES
 # =============================
 
-# Ignore toàn bộ nội dung trong airflow
 airflow/*
 
-# ✅ Nhưng giữ lại DAGs (để có thể push lên GitHub)
 !airflow/dags/
 !airflow/dags/**/*.py
 
-# Ignore các file Airflow runtime local
 airflow/airflow.db
 airflow/airflow.cfg
 airflow/webserver_config.py
