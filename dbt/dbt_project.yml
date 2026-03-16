@@ -15,3 +15,14 @@ target-path: "target"  # nơi dbt build
 clean-targets:
   - "target"
   - "dbt_packages"
+
+models:
+  order_to_delivery:
+
+    staging:
+      +schema: staging
+      +materialized: view
+
+    marts:
+      +schema: marts
+      +materialized: table
