@@ -14,6 +14,7 @@ lake/
 
 dbt/target/
 dbt/logs/
+dbt/dbt_packages/
 
 # =============================
 # 🚫 NOTEBOOKS
@@ -70,3 +71,10 @@ airflow/airflow.cfg
 airflow/webserver_config.py
 airflow/airflow-webserver.pid
 airflow/logs/
+
+# =============================
+# 🚫 OPTIONAL (khuyên thêm)
+# =============================
+
+*.bak
+*.swp
