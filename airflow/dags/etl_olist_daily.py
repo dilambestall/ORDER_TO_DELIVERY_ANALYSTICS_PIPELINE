@@ -5,34 +5,46 @@ from datetime import datetime
 with DAG(
     dag_id="etl_olist_daily",
     start_date=datetime(2024, 1, 1),
-    schedule_interval=None,  # chạy thủ công
+    schedule=None,
     catchup=False,
-    tags=["etl", "olist"]
+    tags=["etl", "olist", "dbt"],
 ) as dag:
 
     start = BashOperator(
         task_id="start",
-        bash_command="echo '🔹 ETL Job Started...'"
+        bash_command='echo "ETL pipeline started"',
     )
 
-    extract = BashOperator(
-        task_id="extract",
-        bash_command="echo '📦 Extracting Olist data...'"
+    dbt_run = BashOperator(
+        task_id="dbt_run",
+        bash_command="""
+        cd /home/phuoc_di/order-to-delivery-analytics/dbt && \
+        source /home/phuoc_di/odap_env/bin/activate && \
+        dbt run
+        """,
     )
 
-    transform = BashOperator(
-        task_id="transform",
-        bash_command="echo '🧹 Transforming data into clean format...'"
+    dbt_test = BashOperator(
+        task_id="dbt_test",
+        bash_command="""
+        cd /home/phuoc_di/order-to-delivery-analytics/dbt && \
+        source /home/phuoc_di/odap_env/bin/activate && \
+        dbt test
+        """,
     )
 
-    load = BashOperator(
-        task_id="load",
-        bash_command="echo '🚀 Loading data into warehouse...'"
+    dbt_docs = BashOperator(
+        task_id="dbt_docs_generate",
+        bash_command="""
+        cd /home/phuoc_di/order-to-delivery-analytics/dbt && \
+        source /home/phuoc_di/odap_env/bin/activate && \
+        dbt docs generate
+        """,
     )
 
     end = BashOperator(
         task_id="end",
-        bash_command="echo '✅ ETL Job Completed Successfully!'"
+        bash_command='echo "ETL pipeline completed successfully"',
     )
 
-    start >> extract >> transform >> load >> end
+    start >> dbt_run >> dbt_test >> dbt_docs >> end
