@@ -16,6 +16,9 @@ jobs:
       run:
         working-directory: dbt
 
+    env:
+      DBT_PROFILES_DIR: .
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -29,6 +32,23 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install dbt-postgres
+
+      - name: Create temporary profiles.yml
+        run: |
+          cat > profiles.yml <<'EOF'
+          order_to_delivery:
+            target: ci
+            outputs:
+              ci:
+                type: postgres
+                host: localhost
+                user: odap
+                password: odap
+                port: 5432
+                dbname: odap
+                schema: public
+                threads: 4
+          EOF
 
       - name: Install packages
         run: |
