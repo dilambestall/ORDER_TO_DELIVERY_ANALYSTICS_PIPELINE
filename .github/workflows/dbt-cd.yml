@@ -1,0 +1,83 @@
+name: dbt CD
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  dbt-cd:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: odap
+          POSTGRES_PASSWORD: odap
+          POSTGRES_DB: odap
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U odap -d odap"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    defaults:
+      run:
+        working-directory: dbt
+
+    env:
+      DBT_PROFILES_DIR: .
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dbt
+        run: |
+          python -m pip install --upgrade pip
+          pip install dbt-postgres
+
+      - name: Create temporary profiles.yml
+        run: |
+          cat > profiles.yml <<'EOF'
+          order_to_delivery:
+            target: ci
+            outputs:
+              ci:
+                type: postgres
+                host: localhost
+                user: odap
+                password: odap
+                port: 5432
+                dbname: odap
+                schema: public
+                threads: 4
+          EOF
+
+      - name: Install packages
+        run: |
+          dbt deps
+
+      - name: Debug dbt connection
+        run: |
+          dbt debug
+
+      - name: Parse project
+        run: |
+          dbt parse
+
+      - name: Compile project
+        run: |
+          dbt compile
+
+      - name: Mark deploy-ready
+        run: |
+          echo "Main branch is deploy-ready."
