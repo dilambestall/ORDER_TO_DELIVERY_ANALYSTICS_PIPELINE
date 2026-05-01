@@ -26,14 +26,6 @@ jobs:
           --health-timeout=5s
           --health-retries=5
 
-    env:
-      DBT_PROFILES_DIR: dbt
-      DB_HOST: localhost
-      DB_PORT: 5432
-      DB_NAME: odap
-      DB_USER: odap
-      DB_PASSWORD: odap
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -48,9 +40,11 @@ jobs:
           python -m pip install --upgrade pip
           pip install dbt-postgres pandas sqlalchemy psycopg2-binary
 
-      - name: Create dbt profiles.yml
+      # FIX QUAN TRỌNG NHẤT
+      - name: Create profiles.yml
         run: |
-          cat > dbt/profiles.yml <<'EOF'
+          mkdir -p ~/.dbt
+          cat <<EOF > ~/.dbt/profiles.yml
           order_to_delivery:
             target: ci
             outputs:
