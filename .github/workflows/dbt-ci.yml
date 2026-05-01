@@ -66,6 +66,16 @@ jobs:
         working-directory: dbt
         run: dbt debug
 
+      # DOWNLOAD DATA
+      - name: Download dataset
+        run: |
+          mkdir -p data/landing
+
+          wget -O data/landing/olist_orders_dataset.csv https://raw.githubusercontent.com/olist/work-at-olist-data/master/datasets/olist_orders_dataset.csv
+          wget -O data/landing/olist_order_items_dataset.csv https://raw.githubusercontent.com/olist/work-at-olist-data/master/datasets/olist_order_items_dataset.csv
+          wget -O data/landing/olist_products_dataset.csv https://raw.githubusercontent.com/olist/work-at-olist-data/master/datasets/olist_products_dataset.csv
+          wget -O data/landing/olist_sellers_dataset.csv https://raw.githubusercontent.com/olist/work-at-olist-data/master/datasets/olist_sellers_dataset.csv
+
       - name: Copy landing data to Bronze
         run: python scripts/load_raw.py
 
