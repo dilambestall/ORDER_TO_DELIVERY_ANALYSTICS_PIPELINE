@@ -40,6 +40,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install dbt-postgres pandas sqlalchemy psycopg2-binary pyarrow
 
+      # TẠO DBT PROFILE CHO CI
       - name: Create profiles.yml
         run: |
           mkdir -p ~/.dbt
@@ -66,7 +67,7 @@ jobs:
         working-directory: dbt
         run: dbt debug
 
-      # DOWNLOAD DATA
+      # DOWNLOAD FULL DATA (ĐÃ FIX THIẾU CUSTOMERS)
       - name: Download dataset
         run: |
           mkdir -p data/landing
@@ -75,7 +76,9 @@ jobs:
           wget -O data/landing/olist_order_items_dataset.csv https://raw.githubusercontent.com/olist/work-at-olist-data/master/datasets/olist_order_items_dataset.csv
           wget -O data/landing/olist_products_dataset.csv https://raw.githubusercontent.com/olist/work-at-olist-data/master/datasets/olist_products_dataset.csv
           wget -O data/landing/olist_sellers_dataset.csv https://raw.githubusercontent.com/olist/work-at-olist-data/master/datasets/olist_sellers_dataset.csv
+          wget -O data/landing/olist_customers_dataset.csv https://raw.githubusercontent.com/olist/work-at-olist-data/master/datasets/olist_customers_dataset.csv
 
+      # PIPELINE DATA
       - name: Copy landing data to Bronze
         run: python scripts/load_raw.py
 
@@ -85,6 +88,7 @@ jobs:
       - name: Load Silver data into Postgres raw
         run: python scripts/load_silver_to_dw.py
 
+      # DBT
       - name: Run dbt models
         working-directory: dbt
         run: dbt run
