@@ -26,12 +26,13 @@ jobs:
           --health-timeout=5s
           --health-retries=5
 
-    defaults:
-      run:
-        working-directory: dbt
-
     env:
-      DBT_PROFILES_DIR: .
+      DBT_PROFILES_DIR: dbt
+      DB_HOST: localhost
+      DB_PORT: 5432
+      DB_NAME: odap
+      DB_USER: odap
+      DB_PASSWORD: odap
 
     steps:
       - name: Checkout code
@@ -42,14 +43,14 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Install dbt
+      - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install dbt-postgres
+          pip install dbt-postgres pandas sqlalchemy psycopg2-binary
 
-      - name: Create profiles.yml
+      - name: Create dbt profiles.yml
         run: |
-          cat > profiles.yml <<'EOF'
+          cat > dbt/profiles.yml <<'EOF'
           order_to_delivery:
             target: ci
             outputs:
@@ -64,15 +65,21 @@ jobs:
                 threads: 4
           EOF
 
-      - name: Install packages
+      - name: Install dbt packages
+        working-directory: dbt
         run: dbt deps
 
-      - name: Debug connection
+      - name: Debug dbt connection
+        working-directory: dbt
         run: dbt debug
 
-      # QUAN TRỌNG NHẤT
+      - name: Load raw data into Postgres
+        run: python scripts/load_raw.py
+
       - name: Run dbt models
+        working-directory: dbt
         run: dbt run
 
       - name: Run dbt tests
+        working-directory: dbt
         run: dbt test
