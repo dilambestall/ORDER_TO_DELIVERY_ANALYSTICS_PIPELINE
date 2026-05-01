@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - master
       - develop
   pull_request:
 
@@ -48,7 +47,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install dbt-postgres
 
-      - name: Create temporary profiles.yml
+      - name: Create profiles.yml
         run: |
           cat > profiles.yml <<'EOF'
           order_to_delivery:
@@ -66,17 +65,14 @@ jobs:
           EOF
 
       - name: Install packages
-        run: |
-          dbt deps
+        run: dbt deps
 
-      - name: Debug dbt connection
-        run: |
-          dbt debug
+      - name: Debug connection
+        run: dbt debug
 
-      - name: Parse project
-        run: |
-          dbt parse
+      # QUAN TRỌNG NHẤT
+      - name: Run dbt models
+        run: dbt run
 
-      - name: Compile project
-        run: |
-          dbt compile
+      - name: Run dbt tests
+        run: dbt test
