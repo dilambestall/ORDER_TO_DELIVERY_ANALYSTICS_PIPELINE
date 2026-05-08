@@ -1,80 +1,56 @@
-# =============================
-# 🚫 DATA FILES
-# =============================
+# Local environment and secrets
+.env
+.env.*
+!.env.example
+.venv/
+venv/
+env/
+odap_env/
 
+# Python cache and test artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Data files and generated lake layers
 data/
 lake/
 *.csv
 *.parquet
 *.xlsx
+!bi/**/*.pbix
 
-# =============================
-# 🚫 DBT BUILD ARTIFACTS
-# =============================
-
+# dbt generated artifacts
 dbt/target/
 dbt/logs/
 dbt/dbt_packages/
 
-# =============================
-# 🚫 NOTEBOOKS
-# =============================
-
-.ipynb_checkpoints/
-
-# =============================
-# 🚫 CACHE & TEMP FILES
-# =============================
-
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-*.tmp
-*.log
-
-# =============================
-# 🚫 ENVIRONMENTS
-# =============================
-
-.env
-.venv/
-env/
-venv/
-odap_env/
-
-# =============================
-# 🚫 OS FILES
-# =============================
-
-.DS_Store
-Thumbs.db
-
-# =============================
-# 🚫 IDE / EDITOR CONFIGS
-# =============================
-
-.vscode/
-.idea/
-
-# =============================
-# 🚫 AIRFLOW LOCAL FILES
-# =============================
-
-airflow/*
-
-!airflow/dags/
-!airflow/dags/**/*.py
-
+# Airflow local runtime state
 airflow/airflow.db
 airflow/airflow.cfg
 airflow/webserver_config.py
 airflow/airflow-webserver.pid
+airflow/standalone_admin_password.txt
 airflow/logs/
 
-# =============================
-# 🚫 OPTIONAL (khuyên thêm)
-# =============================
-
+# Logs and temporary files
+*.log
+*.tmp
 *.bak
 *.swp
+
+# Notebooks
+.ipynb_checkpoints/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE/editor metadata
+.vscode/
+.idea/

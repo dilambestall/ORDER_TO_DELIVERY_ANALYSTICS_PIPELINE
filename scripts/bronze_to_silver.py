@@ -1,26 +1,23 @@
 from pathlib import Path
 import pandas as pd
 
-# Thư mục gốc project
+# Project root directory
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Bronze và Silver
+# Bronze and Silver directories
 BRONZE_DIR = BASE_DIR / "lake" / "bronze" / "olist"
 SILVER_DIR = BASE_DIR / "lake" / "silver" / "olist"
 
 
 def main():
-
     if not BRONZE_DIR.exists():
-        print("Bronze directory không tồn tại")
+        print("Bronze directory does not exist")
         return
 
     tables = list(BRONZE_DIR.iterdir())
-
     total = 0
 
     for table in tables:
-
         if not table.is_dir():
             continue
 
@@ -30,8 +27,7 @@ def main():
             continue
 
         csv_file = csv_files[0]
-
-        print(f"Đang xử lý {csv_file.name}")
+        print(f"Processing {csv_file.name}")
 
         df = pd.read_csv(csv_file)
 
@@ -39,14 +35,12 @@ def main():
         silver_table_dir.mkdir(parents=True, exist_ok=True)
 
         parquet_file = silver_table_dir / f"{table.name}.parquet"
-
         df.to_parquet(parquet_file, index=False)
 
         print(f"[OK] Saved -> {parquet_file}")
-
         total += 1
 
-    print(f"\nHoàn tất. Đã convert {total} bảng sang Silver.")
+    print(f"\nDone. Converted {total} tables to Silver.")
 
 
 if __name__ == "__main__":

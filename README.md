@@ -1,211 +1,225 @@
 # Order-to-Delivery Analytics Pipeline
 
-## Project Overview
+End-to-end analytics engineering project for the Olist Brazilian e-commerce dataset. The pipeline converts raw marketplace order data into curated warehouse models and BI-ready KPIs for revenue, customer segmentation, and delivery performance analysis.
 
-This project is a portfolio Data Engineering / Analytics Engineering project built around an order-to-delivery dataset.
+## Highlights
 
-The goal is to practice building a structured analytics pipeline using Python, PostgreSQL, dbt, Airflow, GitHub Actions, and BI-ready datasets.
+- Layered data lake design: Landing -> Bronze -> Silver
+- PostgreSQL warehouse with `raw`, `staging`, and `marts` schemas
+- dbt transformation layer for staging views, dimensional marts, KPI tables, documentation, and tests
+- Apache Airflow DAG for end-to-end orchestration
+- CI workflow that validates the data pipeline and dbt project on GitHub Actions
+- Power BI-ready output and exported analytical datasets
 
-At the current stage, the project focuses on:
+## Business Questions
 
-* Organizing order-to-delivery data in a clear project structure
-* Loading cleaned data into PostgreSQL
-* Building dbt staging and mart models
-* Creating KPI-ready SQL models for analytics
-* Running dbt validation through GitHub Actions
-* Preparing cleaned datasets for BI/dashboard development
+The project is designed to support questions such as:
 
----
+- How are orders, revenue, and average order value trending over time?
+- Which customers are high-value, loyal, at-risk, or regular based on RFM behavior?
+- How long does delivery take on average?
+- What percentage of delivered orders arrive later than the estimated delivery date?
+- Which customer, product, and seller dimensions support downstream BI analysis?
 
-## Business Objective
-
-The project aims to answer key business questions related to order and delivery performance, such as:
-
-* How many orders were placed?
-* How does revenue change over time?
-* What is the average order value?
-* Which customer segments or regions contribute most to sales?
-* How can order-to-delivery data be prepared for dashboard reporting?
-
----
-
-## Current Architecture
+## Architecture
 
 ```text
-Source CSV Data
-        ↓
-Cleaned / Prepared Data Files
-        ↓
-PostgreSQL Database
-        ↓
-dbt Models
-        ↓
-Staging Models
-        ↓
-Mart / KPI Models
-        ↓
-BI-ready Data Outputs
+Olist CSV Dataset
+        |
+        v
+Landing Layer
+        |
+        v
+Bronze Layer
+Raw source files preserved by dataset
+        |
+        v
+Silver Layer
+Parquet files standardized for downstream loading
+        |
+        v
+PostgreSQL Data Warehouse
+raw -> staging -> marts
+        |
+        v
+dbt Models and Tests
+staging views, dimensions, facts, KPI marts
+        |
+        v
+BI Outputs
+Power BI report and exported analytical datasets
 ```
 
----
+## Tech Stack
 
-## Technologies Used
+| Area | Technology |
+| --- | --- |
+| Data ingestion | Python |
+| Data processing | pandas, pyarrow |
+| Storage format | CSV, Parquet |
+| Data warehouse | PostgreSQL |
+| Transformation | dbt Core, dbt-postgres |
+| Orchestration | Apache Airflow |
+| BI | Power BI, exported CSV |
+| CI/CD | GitHub Actions |
 
-| Category                | Technology              |
-| ----------------------- | ----------------------- |
-| Programming             | Python                  |
-| Database                | PostgreSQL              |
-| Transformation          | dbt Core                |
-| Orchestration           | Apache Airflow          |
-| BI Preparation          | CSV / BI-ready datasets |
-| Version Control         | Git + GitHub            |
-| CI/CD                   | GitHub Actions          |
-| Development Environment | WSL Ubuntu, VS Code     |
-
----
-
-## Project Structure
+## Repository Structure
 
 ```text
-order-to-delivery-analytics-pipeline/
-│
-├── .github/
-│   └── workflows/
-│       └── dbt-ci.yml
-│
-├── airflow/
-│   └── dags/
-│
-├── bi/
-│   └── cleaned_data/
-│
-├── data/
-│
-├── db/
-│   └── ddl/
-│
-├── dbt/
-│   ├── models/
-│   │   ├── staging/
-│   │   └── marts/
-│   ├── dbt_project.yml
-│   └── packages.yml
-│
-├── docs/
-│
-├── lake/
-│
-├── scripts/
-│
-├── README.md
-└── requirements.txt
+.
+|-- airflow/dags/              # Airflow orchestration
+|-- bi/                        # Power BI report and BI-ready exports
+|-- data/landing/              # Raw source files
+|-- db/ddl/                    # Warehouse schema DDL
+|-- dbt/models/staging/        # Source-aligned staging views
+|-- dbt/models/marts/          # Dimensional, fact, KPI, and RFM models
+|-- docs/                      # Supporting documentation
+|-- lake/bronze/               # Raw lake layer
+|-- lake/silver/               # Parquet lake layer
+|-- scripts/                   # Python ETL scripts
+|-- .github/workflows/         # CI/CD workflows
+|-- requirements.txt
+`-- README.md
 ```
 
----
+## Data Pipeline
 
-## Data Processing Layer
-
-The project includes Python scripts for preparing and loading data into the database.
-
-Current focus:
-
-* Read source CSV files
-* Clean and standardize selected datasets
-* Load prepared data into PostgreSQL
-* Store cleaned data outputs for later analytics and BI usage
-
----
-
-## dbt Transformation Layer
-
-dbt is used to transform database tables into analytics-ready models.
-
-Current dbt layers:
-
-| Layer   | Purpose                                | Example Pattern   |
-| ------- | -------------------------------------- | ----------------- |
-| Staging | Clean and standardize source tables    | stg_*             |
-| Marts   | Build business-ready analytical models | customer_*, kpi_* |
-
-The current KPI model is stored under:
+The pipeline is implemented as three Python ETL stages followed by dbt transformations:
 
 ```text
-dbt/models/marts/
+load_raw.py
+  data/landing -> lake/bronze/olist
+
+bronze_to_silver.py
+  lake/bronze/olist -> lake/silver/olist
+
+load_silver_to_dw.py
+  lake/silver/olist -> PostgreSQL raw schema
+
+dbt run + dbt test
+  raw -> staging -> marts
 ```
 
----
+Database credentials are read from a local `.env` file. A sanitized template is provided in `.env.example`; real credentials should never be committed.
 
-## Data Quality Checks
+## dbt Layer
 
-The project includes dbt tests to improve data reliability.
+dbt project: `order_to_delivery`
 
-Current tests include:
+### Sources
 
-* not_null
-* unique
-* dbt_utils.unique_combination_of_columns
+The current dbt source layer reads from PostgreSQL schema `raw`:
 
-These tests help validate important identifiers and prevent duplicate records in analytical models.
+- `olist_orders_dataset`
+- `olist_order_items_dataset`
+- `olist_customers_dataset`
+- `olist_products_dataset`
+- `olist_sellers_dataset`
 
----
+### Staging Models
 
-## Airflow Orchestration
+- `stg_orders`
+- `stg_order_items`
 
-Apache Airflow is included to practice workflow orchestration.
+### Mart Models
 
-At the current stage, the Airflow DAG is used mainly to trigger dbt-related tasks.
+- `dim_customers`
+- `dim_products`
+- `dim_sellers`
+- `fact_order_items`
+- `customer_rfm`
+- `kpi_orders`
+- `kpi_delivery`
 
-This keeps the project closer to a real Data Engineering workflow where transformations are scheduled and monitored instead of being run manually.
+### KPI Outputs
 
----
+`kpi_orders`
 
-## CI/CD with GitHub Actions
+- monthly order count
+- monthly revenue
+- average order value
 
-GitHub Actions is used to validate dbt changes automatically.
+`kpi_delivery`
 
-The current CI workflow includes dbt checks such as:
+- monthly total orders
+- delivered orders
+- average delivery days
+- late delivery count
+- late delivery rate
 
-* Installing required dependencies
-* Setting up the test environment
-* Running dbt commands
-* Validating dbt models and tests
+`customer_rfm`
 
-This helps catch errors before changes are merged or pushed further.
+- recency
+- frequency
+- monetary value
+- RFM score
+- customer segment
 
----
+## Data Quality
 
-## Analytics Output
+The dbt test suite validates core warehouse assumptions:
 
-The project prepares analytics-ready outputs that can be used for dashboard development.
+- non-null primary business keys
+- uniqueness for dimension keys
+- unique `(order_id, order_item_id)` combinations in `fact_order_items`
+- non-null KPI fields for reporting tables
 
-Current analytical focus:
+The project uses `dbt_utils` for advanced generic tests such as `unique_combination_of_columns`.
 
-* Order metrics
-* Revenue metrics
-* Average order value
-* Customer-related analysis
-* Cleaned BI datasets
+## Orchestration
 
-The `bi/cleaned_data/` folder stores prepared data outputs that can be connected to BI tools such as Metabase or Power BI.
+Main DAG: `etl_olist_daily`
 
----
+```text
+start
+  -> load_raw_to_bronze
+  -> bronze_to_silver
+  -> load_silver_to_dw
+  -> dbt_run
+  -> dbt_test
+  -> dbt_docs_generate
+  -> end
+```
 
-## Key Learnings
+The DAG is configured for manual triggering, which keeps local development runs explicit and controlled.
 
-This project demonstrates practical experience with:
+## CI/CD
 
-* Building a structured data project repository
-* Loading data into PostgreSQL
-* Using dbt for staging and mart transformations
-* Writing dbt tests for data quality
-* Using Airflow for orchestration practice
-* Setting up GitHub Actions for dbt CI
-* Preparing data for business intelligence dashboards
+GitHub Actions workflows:
 
----
+- `dbt-ci.yml`: provisions PostgreSQL, downloads source data, runs the Python ETL steps, executes `dbt run`, and validates `dbt test`
+- `dbt-cd.yml`: validates dbt project parsing and compilation for deployment readiness
 
-## Project Status
+## BI Outputs
 
-In Progress
+The BI layer includes:
 
-The project is being developed step by step, with the current focus on dbt transformations, data validation, orchestration practice, and BI-ready analytics outputs.
+- Power BI report: `bi/reports.pbix`
+- exported customer RFM dataset
+- exported monthly KPI dataset
+- exported customer geography dataset
+
+These outputs are designed for stakeholder-facing analysis of sales trends, customer segmentation, and delivery operations.
+
+## Validation
+
+The current pipeline has been validated locally with:
+
+```text
+Python ETL: passed
+dbt compile: passed
+dbt run: passed
+dbt test: 24 passed, 0 failed
+```
+
+## Roadmap
+
+- Add payments, reviews, and geolocation staging models
+- Add `fact_orders`, `fact_payments`, and `dim_dates`
+- Add relationship and accepted-value tests
+- Optimize PostgreSQL loading with bulk insert or COPY
+- Containerize the full local stack with Docker Compose
+
+## License
+
+This project is licensed under the MIT License.

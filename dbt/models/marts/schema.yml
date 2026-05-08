@@ -1,7 +1,6 @@
 version: 2
 
 models:
-
   - name: dim_customers
     description: "Dimension table for customers"
     columns:
@@ -13,14 +12,12 @@ models:
 
   - name: fact_order_items
     description: "Fact table for order items"
-
     tests:
       - dbt_utils.unique_combination_of_columns:
           arguments:
             combination_of_columns:
               - order_id
               - order_item_id
-
     columns:
       - name: order_id
         description: "Order identifier"
@@ -41,11 +38,6 @@ models:
         description: "Product identifier"
         tests:
           - not_null
-
-
-  # =========================
-  # 🔥 MARTS (QUAN TRỌNG)
-  # =========================
 
   - name: customer_rfm
     description: "RFM customer segmentation mart"
@@ -75,7 +67,6 @@ models:
         tests:
           - not_null
 
-
   - name: kpi_orders
     description: "Monthly KPI summary for orders, revenue, and AOV"
     columns:
@@ -95,3 +86,27 @@ models:
       - name: avg_order_value
         tests:
           - not_null
+
+  - name: kpi_delivery
+    description: "Monthly delivery performance KPIs"
+    columns:
+      - name: month
+        tests:
+          - not_null
+          - unique
+
+      - name: total_orders
+        tests:
+          - not_null
+
+      - name: delivered_orders
+        tests:
+          - not_null
+
+      - name: avg_delivery_days
+
+      - name: late_deliveries
+        tests:
+          - not_null
+
+      - name: late_delivery_rate

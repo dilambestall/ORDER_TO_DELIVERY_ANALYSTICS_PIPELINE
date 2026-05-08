@@ -1,16 +1,20 @@
 from pathlib import Path
+import os
 import pandas as pd
 import psycopg2
+from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 SILVER_DIR = BASE_DIR / "lake" / "silver" / "olist"
 
+load_dotenv(BASE_DIR / ".env")
+
 DB_CONFIG = {
-    "host": "localhost",
-    "port": 5432,
-    "database": "odap",
-    "user": "odap",
-    "password": "odap"
+    "host": os.getenv("DB_HOST", "localhost"),
+    "port": int(os.getenv("DB_PORT", "5432")),
+    "database": os.getenv("DB_NAME", "odap"),
+    "user": os.getenv("DB_USER", "odap"),
+    "password": os.getenv("DB_PASSWORD", "odap"),
 }
 
 
@@ -32,7 +36,7 @@ def load_table(parquet_path, table_name, conn):
         columns_sql.append(f'"{col}" {col_type}')
 
     create_table_query = f"""
-    DROP TABLE IF EXISTS raw."{table_name}";
+    DROP TABLE IF EXISTS raw."{table_name}" CASCADE;
 
     CREATE TABLE raw."{table_name}" (
         {", ".join(columns_sql)}
@@ -82,12 +86,10 @@ def main():
         table_name = dataset_dir.name
 
         print(f"Loading raw.{table_name}...")
-
         load_table(parquet_file, table_name, conn)
 
     conn.close()
-
-    print("Done loading Silver → Postgres raw")
+    print("Done loading Silver -> Postgres raw")
 
 
 if __name__ == "__main__":
