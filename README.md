@@ -1,91 +1,85 @@
-# 📦 Order-to-Delivery Analytics Pipeline
+# Order-to-Delivery Analytics Pipeline
 
-## 📌 Project Overview
+## Project Overview
 
-This project is an end-to-end Data Engineering & Analytics pipeline built using modern data stack technologies.
-The goal is to simulate a real-world retail/supply chain analytics system that processes order-to-delivery data and transforms it into business-ready KPIs and dashboards.
+This project is a portfolio Data Engineering / Analytics Engineering project built around an order-to-delivery dataset.
 
-The project follows a layered architecture:
+The goal is to practice building a structured analytics pipeline using Python, PostgreSQL, dbt, Airflow, GitHub Actions, and BI-ready datasets.
 
-* Landing Layer
-* Bronze Layer
-* Silver Layer
-* Data Warehouse Layer
-* Analytics / BI Layer
+At the current stage, the project focuses on:
 
-The pipeline is orchestrated with Apache Airflow and transformed using dbt.
-
----
-
-# 🧠 Business Objective
-
-The project focuses on analyzing:
-
-* Customer purchasing behavior
-* Order processing performance
-* Delivery efficiency
-* Revenue trends
-* Operational KPIs
-
-The final output supports business intelligence dashboards for decision-making.
+* Organizing order-to-delivery data in a clear project structure
+* Loading cleaned data into PostgreSQL
+* Building dbt staging and mart models
+* Creating KPI-ready SQL models for analytics
+* Running dbt validation through GitHub Actions
+* Preparing cleaned datasets for BI/dashboard development
 
 ---
 
-# 🏗️ Architecture
+## Business Objective
+
+The project aims to answer key business questions related to order and delivery performance, such as:
+
+* How many orders were placed?
+* How does revenue change over time?
+* What is the average order value?
+* Which customer segments or regions contribute most to sales?
+* How can order-to-delivery data be prepared for dashboard reporting?
+
+---
+
+## Current Architecture
 
 ```text
-Kaggle CSV Dataset
+Source CSV Data
         ↓
-Landing Layer
+Cleaned / Prepared Data Files
         ↓
-Bronze Layer (Raw Data Lake)
+PostgreSQL Database
         ↓
-Silver Layer (Cleaned + Standardized Data)
+dbt Models
         ↓
-PostgreSQL Data Warehouse
+Staging Models
         ↓
-dbt Transformations
+Mart / KPI Models
         ↓
-Fact / Dimension Models
-        ↓
-KPI Models
-        ↓
-Metabase Dashboard
+BI-ready Data Outputs
 ```
 
 ---
 
-# ⚙️ Technologies Used
+## Technologies Used
 
-| Category        | Technology     |
-| --------------- | -------------- |
-| Programming     | Python         |
-| Database        | PostgreSQL     |
-| Transformation  | dbt Core       |
-| Orchestration   | Apache Airflow |
-| Visualization   | Metabase       |
-| Data Storage    | CSV / Parquet  |
-| Environment     | WSL Ubuntu     |
-| Version Control | Git + GitHub   |
-| CI/CD           | GitHub Actions |
+| Category                | Technology              |
+| ----------------------- | ----------------------- |
+| Programming             | Python                  |
+| Database                | PostgreSQL              |
+| Transformation          | dbt Core                |
+| Orchestration           | Apache Airflow          |
+| BI Preparation          | CSV / BI-ready datasets |
+| Version Control         | Git + GitHub            |
+| CI/CD                   | GitHub Actions          |
+| Development Environment | WSL Ubuntu, VS Code     |
 
 ---
 
-# 📂 Project Structure
+## Project Structure
 
 ```text
-order-to-delivery-analytics/
+order-to-delivery-analytics-pipeline/
+│
+├── .github/
+│   └── workflows/
+│       └── dbt-ci.yml
 │
 ├── airflow/
 │   └── dags/
-│       └── etl_olist_daily.py
+│
+├── bi/
+│   └── cleaned_data/
 │
 ├── data/
-│   └── landing/
-│
-├── lake/
-│   ├── bronze/
-│   └── silver/
 │
 ├── db/
 │   └── ddl/
@@ -93,233 +87,125 @@ order-to-delivery-analytics/
 ├── dbt/
 │   ├── models/
 │   │   ├── staging/
-│   │   ├── marts/
-│   │   └── kpi/
-│   ├── tests/
-│   └── macros/
+│   │   └── marts/
+│   ├── dbt_project.yml
+│   └── packages.yml
 │
 ├── docs/
 │
+├── lake/
+│
 ├── scripts/
-│   ├── load_raw.py
-│   └── load_silver_to_dw.py
 │
-├── .github/
-│   └── workflows/
-│       └── dbt-ci.yml
-│
-├── requirements.txt
-└── README.md
+├── README.md
+└── requirements.txt
 ```
 
 ---
 
-# 🥉 Bronze Layer
+## Data Processing Layer
 
-The Bronze layer stores raw data exactly as received from the source system.
+The project includes Python scripts for preparing and loading data into the database.
 
-Characteristics:
+Current focus:
 
-* Original CSV format
-* No transformation
-* Preserves source integrity
-* Acts as historical backup
+* Read source CSV files
+* Clean and standardize selected datasets
+* Load prepared data into PostgreSQL
+* Store cleaned data outputs for later analytics and BI usage
 
-Example:
+---
+
+## dbt Transformation Layer
+
+dbt is used to transform database tables into analytics-ready models.
+
+Current dbt layers:
+
+| Layer   | Purpose                                | Example Pattern   |
+| ------- | -------------------------------------- | ----------------- |
+| Staging | Clean and standardize source tables    | stg_*             |
+| Marts   | Build business-ready analytical models | customer_*, kpi_* |
+
+The current KPI model is stored under:
 
 ```text
-/lake/bronze/olist_orders_dataset/
+dbt/models/marts/
 ```
 
 ---
 
-# 🥈 Silver Layer
+## Data Quality Checks
 
-The Silver layer standardizes and cleans raw data.
+The project includes dbt tests to improve data reliability.
 
-Processes include:
+Current tests include:
 
-* Data type conversion
-* Null handling
-* Duplicate removal
-* Standardized column naming
-* Parquet conversion
-
-Benefits:
-
-* Faster querying
-* Better storage efficiency
-* Easier downstream transformations
-
----
-
-# 🏢 Data Warehouse Design
-
-The warehouse follows a dimensional modeling approach.
-
-## Dimension Tables
-
-* dim_customers
-* dim_products
-* dim_sellers
-* dim_dates
-
-## Fact Tables
-
-* fact_orders
-* fact_order_items
-* fact_payments
-
----
-
-# 🔄 dbt Transformation Layer
-
-The dbt layer handles:
-
-* Staging models
-* Data quality tests
-* Fact & dimension modeling
-* KPI calculations
-* Documentation generation
-
-Naming convention:
-
-| Layer     | Pattern |
-| --------- | ------- |
-| Staging   | stg_*   |
-| Dimension | dim_*   |
-| Fact      | fact_*  |
-| KPI       | kpi_*   |
-
-Example:
-
-```text
-stg_orders
-fact_orders
-kpi_orders
-```
-
----
-
-# ✅ dbt Tests
-
-Implemented data quality tests include:
-
-* unique
 * not_null
-* relationships
-* accepted_values
+* unique
+* dbt_utils.unique_combination_of_columns
 
-Example:
-
-```yaml
-models:
-  - name: dim_customers
-    columns:
-      - name: customer_id
-        tests:
-          - unique
-          - not_null
-```
+These tests help validate important identifiers and prevent duplicate records in analytical models.
 
 ---
 
-# ⏰ Airflow Orchestration
+## Airflow Orchestration
 
-Apache Airflow is used to orchestrate the ETL pipeline.
+Apache Airflow is included to practice workflow orchestration.
 
-Main DAG:
+At the current stage, the Airflow DAG is used mainly to trigger dbt-related tasks.
 
-```text
-etl_olist_daily
-```
-
-Pipeline tasks:
-
-1. Load landing data
-2. Move to Bronze layer
-3. Transform to Silver layer
-4. Load warehouse tables
-5. Run dbt models
-6. Run dbt tests
+This keeps the project closer to a real Data Engineering workflow where transformations are scheduled and monitored instead of being run manually.
 
 ---
 
-# 📊 KPI Dashboard
+## CI/CD with GitHub Actions
 
-The BI dashboard focuses on:
+GitHub Actions is used to validate dbt changes automatically.
 
-## Sales KPIs
+The current CI workflow includes dbt checks such as:
 
-* Total Revenue
-* Total Orders
-* Average Order Value
-* Monthly Revenue Trend
+* Installing required dependencies
+* Setting up the test environment
+* Running dbt commands
+* Validating dbt models and tests
 
-## Operational KPIs
-
-* Delivery Time
-* Late Delivery Rate
-* Order Status Distribution
-
-## Customer KPIs
-
-* Repeat Customers
-* Customer Segmentation
-* Top Cities by Revenue
+This helps catch errors before changes are merged or pushed further.
 
 ---
 
-# 📈 Dashboard Features
+## Analytics Output
 
-The Metabase dashboard includes:
+The project prepares analytics-ready outputs that can be used for dashboard development.
 
-* KPI cards
-* Revenue trend analysis
-* Order trend analysis
-* Donut charts
-* Regional performance analysis
-* Customer insights
+Current analytical focus:
 
----
+* Order metrics
+* Revenue metrics
+* Average order value
+* Customer-related analysis
+* Cleaned BI datasets
 
-# 🚀 CI/CD Pipeline
-
-GitHub Actions is used for CI validation.
-
-Current workflow:
-
-```text
-.github/workflows/dbt-ci.yml
-```
-
-CI checks:
-
-* dbt dependency installation
-* dbt debug
-* dbt run
-* dbt test
+The `bi/cleaned_data/` folder stores prepared data outputs that can be connected to BI tools such as Metabase or Power BI.
 
 ---
 
-# 📚 Key Learnings
+## Key Learnings
 
-Through this project, the following concepts were practiced:
+This project demonstrates practical experience with:
 
-* End-to-end ETL pipeline development
-* Data Lake architecture
-* Dimensional modeling
-* dbt transformation workflow
-* Airflow orchestration
-* Data quality testing
-* CI/CD for data projects
-* BI dashboard design
-* Git & collaborative workflows
+* Building a structured data project repository
+* Loading data into PostgreSQL
+* Using dbt for staging and mart transformations
+* Writing dbt tests for data quality
+* Using Airflow for orchestration practice
+* Setting up GitHub Actions for dbt CI
+* Preparing data for business intelligence dashboards
 
 ---
 
-# ⭐ Project Status
+## Project Status
 
-✅ In Progress
+In Progress
 
-The project is continuously updated with new pipeline features and dashboard improvements.
+The project is being developed step by step, with the current focus on dbt transformations, data validation, orchestration practice, and BI-ready analytics outputs.
